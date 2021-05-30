@@ -4,9 +4,9 @@ services:
   dind:
     image: docker:dind
     ports:
-      - "127.0.0.1:6445:6445"
-      - "127.0.0.1:30080:80"
-      - "127.0.0.1:30180:30180"
+      - "0.0.0.0:6445:6445"
+      - "0.0.0.0:30080:80"
+      - "0.0.0.0:30180:30180"
     volumes:
       - ./bootstrap:/bootstrap
     working_dir: /bootstrap
