@@ -1,0 +1,4 @@
+bootstrap/kubectl
+bootstrap/k3d
+bootstrap/kubeconfig
+
