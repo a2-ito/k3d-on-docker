@@ -53,7 +53,7 @@ fi
 k3d kubeconfig get -a > /bootstrap/kubeconfig
 
 echo "#################################################################################"
-echo "# Install kubectl"
+echo "# Install kubectl (latest)"
 echo "#################################################################################"
 if [ ! -e "/bootstrap/kubectl" ]; then
   curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -93,7 +93,28 @@ echo "##########################################################################
 kubectl create namespace argocd
 kubectl apply -n argocd -f $MANIFESTS_DIR/argocd/install.yaml
 
+echo "#################################################################################"
+echo "# Install Helm3"
+echo "#################################################################################"
+apk add bash
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+
+install_crossplane
+
 exit 0
+
+function install_crossplane(){
+  echo "#################################################################################"
+  echo "# Install crossplane"
+  echo "#################################################################################"
+  kubectl create namespace crossplane-system
+  helm repo add crossplane-stable https://charts.crossplane.io/stable
+  helm repo update
+  helm install crossplane --namespace crossplane-system crossplane-stable/crossplane --version 1.2.1
+  curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh
+}
 
 kubectl apply -f $MANIFESTS_DIR/traefik-service.yaml
 echo "#################################################################################"

@@ -1,7 +1,7 @@
 bootstrap/kubectl
+bootstrap/kubectl-crossplane
 bootstrap/k3d
 bootstrap/kubeconfig
+bootstrap/get_helm.sh
 kubeconfig
-
-
 
