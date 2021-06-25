@@ -93,6 +93,20 @@ echo "##########################################################################
 kubectl create namespace argocd
 kubectl apply -n argocd -f $MANIFESTS_DIR/argocd/install.yaml
 
+while true
+do
+  _status=`kubectl get pod -n argocd | grep argocd-server | tail -n1 | awk '{print $3}'`
+  if [ "${_status}" != "Running" ]; then
+    echo current status : ${_status}
+    sleep 5
+  else
+    echo current status : ${_status}
+    break
+  fi
+done
+
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+
 echo "#################################################################################"
 echo "# Install Helm3"
 echo "#################################################################################"
