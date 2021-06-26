@@ -6,5 +6,5 @@ spec:
   template:
     spec:
       containers:
-      - name: nginx
-        image: nginx:v1.0.5
+      - name: nginx-overlays
+        image: nginx
