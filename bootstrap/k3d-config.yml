@@ -23,6 +23,9 @@ ports:
   - port: 30180:30180 # same as `--port '8080:80@loadbalancer'`
     nodeFilters:
       - server[0]
+  - port: 31080:31080 # for argocd nodeport
+    nodeFilters:
+      - server[0]
 env:
   - envVar: bar=baz # same as `--env 'bar=baz@server[0]'`
     nodeFilters:
