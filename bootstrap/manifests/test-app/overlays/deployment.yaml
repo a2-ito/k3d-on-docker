@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: sada4j-deployment
+spec:
+  template:
+    spec:
+      containers:
+      - name: nginx
+        image: custom.image.io/nginx:v1.0.5

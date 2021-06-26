@@ -93,19 +93,23 @@ echo "##########################################################################
 kubectl create namespace argocd
 kubectl apply -n argocd -f $MANIFESTS_DIR/argocd/install.yaml
 
+_target_pod=argocd-server
 while true
 do
-  _status=`kubectl get pod -n argocd | grep argocd-server | tail -n1 | awk '{print $3}'`
+  _status=`kubectl get pod -n argocd | grep ${_target_pod} | tail -n1 | awk '{print $3}'`
   if [ "${_status}" != "Running" ]; then
-    echo current status : ${_status}
+    echo current status - ${_target_pod} : ${_status}
     sleep 5
   else
-    echo current status : ${_status}
+    echo current status - ${_target_pod} : ${_status}
     break
   fi
 done
 
+kubectl apply -f $MANIFESTS_DIR/argocd/argocd-server-svc-nodeport.yaml
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+
+exit 0
 
 echo "#################################################################################"
 echo "# Install Helm3"
@@ -117,7 +121,6 @@ chmod 700 get_helm.sh
 
 install_crossplane
 
-exit 0
 
 function install_crossplane(){
   echo "#################################################################################"
