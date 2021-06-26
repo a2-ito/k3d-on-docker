@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: sada4j-service
-internal: "true"
+  name: test-app-service
 spec:
   type: LoadBalancer
   ports:
