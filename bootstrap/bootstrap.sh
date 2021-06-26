@@ -109,6 +109,8 @@ done
 kubectl apply -f $MANIFESTS_DIR/argocd/argocd-server-svc-nodeport.yaml
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
 
+kubectl apply -f $MANIFESTS_DIR/argocd/application.yaml
+
 exit 0
 
 echo "#################################################################################"
