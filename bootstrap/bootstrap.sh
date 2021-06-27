@@ -65,14 +65,15 @@ echo "##########################################################################
 echo "# Traefik dashboard configuration"
 echo "#################################################################################"
 echo "## Wait Traefik pod for Running"
+_target_pod=svclb-traefik
 while true
 do
-  _status=`kubectl get pod -n kube-system | grep svclb-traefik | tail -n1 | awk '{print $3}'`
+  _status=`kubectl get pod -n argocd | grep ${_target_pod} | tail -n1 | awk '{print $3}'`
   if [ "${_status}" != "Running" ]; then
-    echo current status : ${_status}
+    echo current status [${_target_pod}]: ${_status}
     sleep 5
   else
-    echo current status : ${_status}
+    echo current status [${_target_pod}]: ${_status}
     break
   fi
 done
@@ -91,25 +92,25 @@ echo "##########################################################################
 echo "# Install ArgoCD"
 echo "#################################################################################"
 kubectl create namespace argocd
-kubectl apply -n argocd -f $MANIFESTS_DIR/argocd/install.yaml
+kubectl apply -n argocd -f $MANIFESTS_DIR/infra-argocd-install/install.yaml
 
 _target_pod=argocd-server
 while true
 do
   _status=`kubectl get pod -n argocd | grep ${_target_pod} | tail -n1 | awk '{print $3}'`
   if [ "${_status}" != "Running" ]; then
-    echo current status - ${_target_pod} : ${_status}
+    echo current status [${_target_pod}] : ${_status}
     sleep 5
   else
-    echo current status - ${_target_pod} : ${_status}
+    echo current status [${_target_pod}] : ${_status}
     break
   fi
 done
 
-kubectl apply -f $MANIFESTS_DIR/argocd/argocd-server-svc-nodeport.yaml
+kubectl apply -f $MANIFESTS_DIR/infra-argocd-install/argocd-server-svc-nodeport.yaml
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
 
-kubectl apply -f $MANIFESTS_DIR/argocd/application.yaml
+kubectl apply -f $MANIFESTS_DIR/infra-argocd-application/argocd-root/application.yaml
 
 exit 0
 
