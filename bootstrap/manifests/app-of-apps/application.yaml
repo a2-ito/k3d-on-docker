@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: https://github.com/a2-ito/k3d-on-docker.git
     targetRevision: HEAD
-    path: bootstrap/manifestsp/argocd-application/overlays/prd
+    path: bootstrap/manifests/argocd-application/overlays/prd
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
