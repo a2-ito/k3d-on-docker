@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: test-app-overlays-dev-a
+  name: test-app-overlays
   namespace: argocd
 spec:
   project: default
