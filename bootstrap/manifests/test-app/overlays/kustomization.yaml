@@ -1,7 +1,7 @@
 bases:
 - ../base
 
-namespace: test-app-overralys
+namespace: test-app-overralys-a
 
 patches:
 - deployment.yaml
