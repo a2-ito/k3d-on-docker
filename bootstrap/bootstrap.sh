@@ -110,7 +110,7 @@ done
 kubectl apply -f $MANIFESTS_DIR/infra-argocd-install/argocd-server-svc-nodeport.yaml
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
 
-kubectl apply -f $MANIFESTS_DIR/infra-argocd-application/argocd-root/application.yaml
+kubectl apply -f $MANIFESTS_DIR/infra-argocd-application/argocd-root/overlays/dev/application.yaml
 
 exit 0
 

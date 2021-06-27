@@ -1,15 +1,15 @@
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: test-app-b
+  name: argocd-app-B
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/a2-ito/k3d-on-docker.git
     targetRevision: HEAD
-    path: bootstrap/manifests/test-app/overlays/dev/b
+    path: bootstrap/manifests/argocd-application/overlays/prd
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
-
