@@ -68,7 +68,7 @@ echo "## Wait Traefik pod for Running"
 _target_pod=svclb-traefik
 while true
 do
-  _status=`kubectl get pod -n argocd | grep ${_target_pod} | tail -n1 | awk '{print $3}'`
+  _status=`kubectl get pod -n kube-system | grep ${_target_pod} | tail -n1 | awk '{print $3}'`
   if [ "${_status}" != "Running" ]; then
     echo current status [${_target_pod}]: ${_status}
     sleep 5
@@ -88,31 +88,35 @@ kubectl delete pod -n kube-system $traefikpod
 
 kubectl apply -f $MANIFESTS_DIR/deploy-whoami.yaml
 
-echo "#################################################################################"
-echo "# Install ArgoCD"
-echo "#################################################################################"
-kubectl create namespace argocd
-kubectl apply -n argocd -f $MANIFESTS_DIR/infra-argocd-install/install.yaml
-
-_target_pod=argocd-server
-while true
-do
-  _status=`kubectl get pod -n argocd | grep ${_target_pod} | tail -n1 | awk '{print $3}'`
-  if [ "${_status}" != "Running" ]; then
-    echo current status [${_target_pod}] : ${_status}
-    sleep 5
-  else
-    echo current status [${_target_pod}] : ${_status}
-    break
-  fi
-done
-
-kubectl apply -f $MANIFESTS_DIR/infra-argocd-install/argocd-server-svc-nodeport.yaml
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
-
-kubectl apply -f $MANIFESTS_DIR/infra-argocd-application/argocd-root/overlays/dev/application.yaml
-
+install_argocd
 exit 0
+
+function install_argocd(){
+  echo "#################################################################################"
+  echo "# Install ArgoCD"
+  echo "#################################################################################"
+  kubectl create namespace argocd
+  kubectl apply -n argocd -f $MANIFESTS_DIR/infra-argocd-install/install.yaml
+
+  _target_pod=argocd-server
+  while true
+  do
+    _status=`kubectl get pod -n argocd | grep ${_target_pod} | tail -n1 | awk '{print $3}'`
+    if [ "${_status}" != "Running" ]; then
+      echo current status [${_target_pod}] : ${_status}
+      sleep 5
+    else
+      echo current status [${_target_pod}] : ${_status}
+      break
+    fi
+  done
+
+  kubectl apply -f $MANIFESTS_DIR/infra-argocd-install/argocd-server-svc-nodeport.yaml
+  kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+
+  kubectl apply -k $MANIFESTS_DIR/infra-argocd-application/argocd-root/overlays/dev
+  kubectl apply -f $MANIFESTS_DIR/infra-argocd-application/argocd-config/application-argocd-config.yaml
+}
 
 echo "#################################################################################"
 echo "# Install Helm3"
