@@ -1,5 +1,0 @@
-resources:
-  - ../../base
-nameSuffix: -c
-patches:
-  - application.yaml

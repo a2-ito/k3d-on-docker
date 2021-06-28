@@ -1,7 +1,0 @@
-bases:
-- ../../../base
-
-namespace: test-app1-a
-
-patches:
-- deployment.yaml

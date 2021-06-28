@@ -1,5 +1,3 @@
 resources:
-  - ../base
-patches:
   - application-service1.yaml
   - application-service2.yaml

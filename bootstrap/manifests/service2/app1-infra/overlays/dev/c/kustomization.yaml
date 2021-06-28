@@ -1,0 +1,8 @@
+bases:
+- ../../../base
+
+nameSuffix: -app1-c
+namespace: test-service1-app1-c
+
+patches:
+- deployment.yaml
