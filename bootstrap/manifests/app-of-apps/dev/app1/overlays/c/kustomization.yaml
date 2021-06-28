@@ -1,6 +1,5 @@
 resources:
   - ../../base
-namespace: app1-c
 nameSuffix: -c
 patches:
   - application.yaml

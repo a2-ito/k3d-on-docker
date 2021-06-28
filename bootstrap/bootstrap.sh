@@ -88,8 +88,6 @@ kubectl delete pod -n kube-system $traefikpod
 
 kubectl apply -f $MANIFESTS_DIR/deploy-whoami.yaml
 
-install_argocd
-exit 0
 
 function install_argocd(){
   echo "#################################################################################"
@@ -117,6 +115,9 @@ function install_argocd(){
   kubectl apply -k $MANIFESTS_DIR/infra-argocd-application/argocd-root/overlays/dev
   kubectl apply -f $MANIFESTS_DIR/infra-argocd-application/argocd-config/application-argocd-config.yaml
 }
+
+install_argocd
+exit 0
 
 echo "#################################################################################"
 echo "# Install Helm3"
