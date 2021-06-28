@@ -5,4 +5,4 @@ metadata:
   namespace: argocd
 spec:
   source:
-    path: bootstrap/manifests/app-of-apps/prd
+    path: bootstrap/manifests/app-of-apps/overlays/prd

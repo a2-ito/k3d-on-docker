@@ -5,4 +5,4 @@ metadata:
   namespace: argocd
 spec:
   source:
-    path: bootstrap/manifests/app-of-apps/dev
+    path: bootstrap/manifests/app-of-apps/overlays/dev
