@@ -1,4 +1,5 @@
 resources:
   - ../../base
+namespace: app2-a
 patches:
   - application.yaml
