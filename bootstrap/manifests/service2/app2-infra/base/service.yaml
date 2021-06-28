@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: test-app-service
+  name: test-app-service2
 spec:
   type: NodePort
   ports:

@@ -2,7 +2,7 @@ bases:
 - ../../../base
 
 nameSuffix: -app2-b
-namespace: test-service1-app2-b
+namespace: test-service2-app2-b
 
 patches:
 - deployment.yaml
