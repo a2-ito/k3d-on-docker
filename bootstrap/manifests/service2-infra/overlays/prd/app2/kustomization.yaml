@@ -1,0 +1,5 @@
+resources:
+  - ../../../base
+nameSuffix: -app2
+patches:
+  - application.yaml
