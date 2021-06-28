@@ -5,4 +5,4 @@ metadata:
   namespace: argocd
 spec:
   source:
-    path: bootstrap/manifests/service2/dev
+    path: bootstrap/manifests/service2-infra/overlays/dev
