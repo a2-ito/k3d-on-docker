@@ -1,3 +1,4 @@
 resources:
   - project-infra.yaml
   - project-service1.yaml
+  - project-service2.yaml

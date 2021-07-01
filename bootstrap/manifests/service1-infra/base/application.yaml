@@ -4,7 +4,7 @@ metadata:
   name: service1
   namespace: argocd
 spec:
-  project: default
+  project: service1
   source:
     repoURL: https://github.com/a2-ito/k3d-on-docker.git
     targetRevision: HEAD
