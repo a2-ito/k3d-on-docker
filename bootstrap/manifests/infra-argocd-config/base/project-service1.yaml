@@ -4,6 +4,9 @@ metadata:
   name: service1
   namespace: argocd
 spec:
+  clusterResourceWhitelist:
+  - group: ''
+    kind: 'Namespace'
   description: app-of-apps
   sourceRepos:
   - '*'
