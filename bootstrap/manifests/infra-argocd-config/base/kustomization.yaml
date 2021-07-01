@@ -1,0 +1,3 @@
+resources:
+  - project-infra.yaml
+  - project-service1.yaml
