@@ -5,6 +5,8 @@ echo "# Environment Values "
 echo "#################################################################################"
 
 MANIFESTS_DIR=/bootstrap/manifests
+K3D_VERSION=v5.4.6
+ARCHITECTURE=arm64
 
 if command -v apt-get >/dev/null; then
   echo "apt-get is used here"
@@ -39,54 +41,82 @@ echo "##########################################################################
 sleep 1
 #curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | sh
 if [ ! -e "/bootstrap/k3d" ]; then
-	wget -O /bootstrap/k3d https://github.com/rancher/k3d/releases/download/v4.4.4/k3d-linux-amd64
+	wget -O /bootstrap/k3d https://github.com/k3d-io/k3d/releases/download/${K3D_VERSION}/k3d-linux-${ARCHITECTURE}
 fi
 chmod +x /bootstrap/k3d
 cp /bootstrap/k3d /usr/local/bin/k3d
+sleep 3
 k3d cluster create --config /bootstrap/k3d-config.yml
 if [ $? -ne 0 ]; then
 	echo "##### k3d cluster create failed #####"
 	sleep 3
-	k3d cluster create \
-		--config /bootstrap/k3d-config.yml
-fi	
+	k3d cluster create --config /bootstrap/k3d-config.yml
+fi
 k3d kubeconfig get -a > /bootstrap/kubeconfig
 
 echo "#################################################################################"
 echo "# Install kubectl (latest)"
 echo "#################################################################################"
 if [ ! -e "/bootstrap/kubectl" ]; then
-  curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+	curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl"
 fi
 chmod +x /bootstrap/kubectl
 cp /bootstrap/kubectl /usr/local/bin/
 
-echo "#################################################################################"
-echo "# Traefik dashboard configuration"
-echo "#################################################################################"
-echo "## Wait Traefik pod for Running"
-_target_pod=svclb-traefik
-while true
-do
-  _status=`kubectl get pod -n kube-system | grep ${_target_pod} | tail -n1 | awk '{print $3}'`
-  if [ "${_status}" != "Running" ]; then
-    echo current status [${_target_pod}]: ${_status}
-    sleep 5
-  else
-    echo current status [${_target_pod}]: ${_status}
-    break
-  fi
-done
-kubectl apply -f $MANIFESTS_DIR/traefik-configmap.yaml
-kubectl apply -f $MANIFESTS_DIR/traefik-ingress-webui-http.yaml
-kubectl apply -f $MANIFESTS_DIR/traefik-dashboard-svc-nodeport.yaml
-kubectl apply -f $MANIFESTS_DIR/traefik-dashboard-svc-clusterip.yaml
+function configure_traefik_dashboard(){
+	echo "#################################################################################"
+	echo "# Traefik dashboard configuration"
+	echo "#################################################################################"
+	echo "## Wait Traefik pod for Running"
+	_target_pod=svclb-traefik
+	while true
+	do
+  	_status=`kubectl get pod -n kube-system | grep ${_target_pod} | tail -n1 | awk '{print $3}'`
+  	if [ "${_status}" != "Running" ]; then
+  		echo current status [${_target_pod}]: ${_status}
+  		sleep 5
+  	else
+    	echo current status [${_target_pod}]: ${_status}
+    	break
+  	fi
+	done
+	#kubectl apply -f $MANIFESTS_DIR/traefik-configmap.yaml
+	#kubectl apply -f $MANIFESTS_DIR/traefik-ingress-webui-http.yaml
+	kubectl apply -f $MANIFESTS_DIR/traefik-dashboard-svc-np.yaml
+	kubectl apply -f $MANIFESTS_DIR/traefik-dashboard-svc-cip.yaml
+	kubectl apply -f $MANIFESTS_DIR/traefik-dashboard-ingress.yaml
 
-traefikpod=$(kubectl get pod -n kube-system | grep -e '^traefik' | cut -d' ' -f1)
-kubectl delete pod -n kube-system $traefikpod
+	traefikpod=$(kubectl get pod -n kube-system | grep -e '^traefik' | cut -d' ' -f1)
+	kubectl delete pod -n kube-system $traefikpod
+}
 
-
+configure_traefik_dashboard
 kubectl apply -f $MANIFESTS_DIR/deploy-whoami.yaml
+
+exit 0
+
+function install_helm(){
+	echo "#################################################################################"
+	echo "# Install Helm3"
+	echo "#################################################################################"
+	apk add bash
+	curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+	chmod 700 get_helm.sh
+	./get_helm.sh
+}
+install_helm
+
+function install_traefik_v2(){
+	echo "#################################################################################"
+	echo "# Install Traefik"
+	echo "#################################################################################"
+	helm repo add traefik https://traefik.github.io/charts
+	helm repo update
+	kubectl create ns traefik-v2
+	helm install --namespace=traefik-v2 traefik traefik/traefik
+}
+install_traefik_v2
+
 
 
 function install_argocd(){
@@ -94,7 +124,8 @@ function install_argocd(){
   echo "# Install ArgoCD"
   echo "#################################################################################"
   kubectl create namespace argocd
-  kubectl apply -n argocd -f $MANIFESTS_DIR/infra-argocd-install/install.yaml
+  # kubectl apply -n argocd -f $MANIFESTS_DIR/infra-argocd-install/install.yaml
+	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
   _target_pod=argocd-server
   while true
@@ -117,18 +148,8 @@ function install_argocd(){
 }
 
 install_argocd
-exit 0
-
-echo "#################################################################################"
-echo "# Install Helm3"
-echo "#################################################################################"
-apk add bash
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-chmod 700 get_helm.sh
-./get_helm.sh
 
 install_crossplane
-
 
 function install_crossplane(){
   echo "#################################################################################"

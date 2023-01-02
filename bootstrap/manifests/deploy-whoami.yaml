@@ -33,7 +33,7 @@ spec:
     port: 80
     targetPort: 80
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-whoami-traefik17
@@ -43,7 +43,10 @@ spec:
     - host: whoami.k3d.local
       http:
         paths:
-        - path: /
-          backend:
-            serviceName: whoami
-            servicePort: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whoami
+                port:
+                  number: 80

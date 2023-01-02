@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   dind:
+    container_name: k3d-on-docker-dind
     image: docker:dind
     ports:
       - "0.0.0.0:6445:6445"   # kube-apiserver
